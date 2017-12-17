@@ -1,0 +1,10 @@
+---
+# Tested with Ansible 1.9.6
+- hosts: test
+  vars:
+    # This password is rubbish!.
+    pass: $5$aZMcCvjDZQK5$1I6aDdeqU8rYVrUh2GVy8VFJBBB74artebsmkiNGoHB 
+  user: root
+  tasks:
+  - name: Create a user.
+    user: name=joe shell=/bin/bash createhome=yes password={{ pass }} state=present
