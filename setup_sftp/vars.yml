@@ -1,0 +1,9 @@
+# Needed variables to setup an SSH based SFTP server.  
+
+ssh_config_file: "/etc/ssh/sshd_config"
+sftp_user: "joe"
+sftp_user_pass: $9$f.w.4e7Uo3$fBqWRIfOoEogzTJ123qArUnrlKiEG0rqp95wm6IVmU/
+sftp_user_shell: "/usr/sbin/nologin"
+sftp_group: "sftpusers"
+sftp_parent_dir: "/home/sftp"
+sftp_rootdir: "/home/sftp/{{sftp_user}}"

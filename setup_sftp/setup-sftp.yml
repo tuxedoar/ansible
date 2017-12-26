@@ -1,0 +1,76 @@
+---
+# Setup an SSH based SFTP server.
+# Tested with Ansible 1.9.6
+
+- hosts: test
+  user: root
+
+  vars_files: 
+  - vars.yml
+
+  pre_tasks:
+  - name: Update APT repositories. 
+    apt: update_cache=yes cache_valid_time=3600
+
+  handlers:
+  - name: restart ssh
+    service: name=ssh state=restarted
+
+  tasks:
+    - name: Install necessary packages 
+      apt: name={{ item }} state=installed
+        install_recommends=no
+      with_items:
+        - login
+
+    - name: Create a group for the SFTP server
+      group:
+        name: "{{ sftp_group }}"
+        state: present
+
+    - name: Create a user for the SFTP server
+      user:
+        name: "{{ sftp_user }}"
+        group: "{{ sftp_group }}"
+        createhome: no
+        home: "{{ sftp_rootdir }}"
+        shell: "{{ sftp_user_shell }}" 
+        password: "{{ sftp_user_pass }}"
+
+    - name: Create SFTP parent directory
+      file: 
+        dest: "{{ sftp_parent_dir }}"
+        owner: root
+        group: root
+        mode: 0755
+        state: directory 
+
+    - name: Create SFTP root directory
+      file:
+        dest: "{{ sftp_rootdir }}"
+        state: directory
+        owner: "{{ sftp_user }}"
+        group: "{{ sftp_group }}"
+        mode: 0755
+
+    - name: SSH - Comment out a line in config file 
+      replace:
+        dest: "{{ ssh_config_file }}" 
+        regexp: '(^Subsystem\ssftp\s\/usr\/lib*)'
+        replace: '#\1'
+
+    - name: SSH - Insert SFTP line in config file
+      lineinfile:
+        dest: "{{ ssh_config_file }}"
+        line: Subsystem sftp internal-sftp
+        insertafter: '^#Subsystem\ssftp\s\/usr\/lib*'
+
+    - name: SSH - Add SFTP related lines in config file
+      lineinfile:
+        dest: "{{ ssh_config_file }}"
+        line: "{{ item }}"
+      with_items:
+          - Match Group {{ sftp_group }}
+          - ChrootDirectory {{ sftp_parent_dir }}
+          - ForceCommand internal-sftp
+      notify: restart ssh
