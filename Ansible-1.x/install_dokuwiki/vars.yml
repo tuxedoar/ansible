@@ -1,0 +1,10 @@
+# Needed variables to install dokuwiki
+
+# Route to the installer file.  
+dokuwiki_file: "/route/to/dokuwiki-stable.tgz"
+# Dokuwiki directory name after being decompressed. 
+dokuwiki_dirname: "dokuwiki"
+# Document root for Apache. 
+dokuwiki_docroot: "/var/www/dokuwiki"
+# Domain name setting for Apache. 
+domain: "my-dokuwiki"

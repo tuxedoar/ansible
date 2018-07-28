@@ -1,0 +1,24 @@
+<VirtualHost *:80>
+
+        ServerAdmin webmaster@localhost
+	ServerName {{ domain  }}
+        DocumentRoot {{ dokuwiki_docroot }}
+
+	<Directory {{ dokuwiki_docroot }}>
+                Order deny,allow
+                allow from all
+        </Directory>
+
+
+        <LocationMatch "/(data|conf|bin|inc)/">
+            Order allow,deny
+            deny from all
+            satisfy all
+        </LocationMatch>
+
+	LogLevel warn
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>
